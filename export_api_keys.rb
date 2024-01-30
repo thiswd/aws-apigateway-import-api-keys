@@ -8,9 +8,10 @@ end
 
 region = ARGV[0]
 apigateway = Aws::APIGateway::Client.new(region: region)
+input_file = "api_keys.json"
 
 begin
-  file = File.read("api_keys.json")
+  file = File.read(input_file)
   api_keys = JSON.parse(file)
 rescue Errno::ENOENT => e
   puts "Error: File not found - #{e.message}"
@@ -39,6 +40,7 @@ begin
       usage_plans = apigateway.get_usage_plans(key_id: key["id"]).items
 
       if usage_plans.empty?
+        puts "Key #{key["name"]} (#{key["id"]}) has no usage plans"
         api_keys_without_plan_count += 1
       end
 
@@ -50,7 +52,7 @@ begin
       }
       api_keys_count += 1
     rescue Aws::APIGateway::Errors::ServiceError => e
-      puts "Error retrieving usage plans for key #{key["name"]}(#{key["id"]}): #{e.message}"
+      puts "Error retrieving usage plans for key #{key["name"]} (#{key["id"]}): #{e.message}"
       error_count += 1
     end
   end
@@ -60,6 +62,16 @@ begin
   puts "Total API Keys: #{api_keys_count}"
   puts "Total API Keys without usage plans: #{api_keys_without_plan_count}"
   puts "Total Errors: #{error_count}"
+
+  begin
+    puts "Deleting #{input_file}..."
+    File.delete(input_file)
+    puts "#{input_file} has been successfully deleted."
+  rescue Errno::ENOENT
+    puts "Error: The file #{input_file} does not exist."
+  rescue StandardError => e
+    puts "An error occurred while deleting the file #{input_file}: #{e.message}"
+  end
 
 rescue StandardError => e
   puts "An error occurred: #{e.message}"
