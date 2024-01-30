@@ -1,7 +1,13 @@
 require 'aws-sdk-apigateway'
 require 'json'
 
-apigateway = Aws::APIGateway::Client.new(region: "sa-east-1")
+if ARGV.length != 1
+  puts "Usage: ruby export_keys.rb <AWS_REGION>"
+  exit
+end
+
+region = ARGV[0]
+apigateway = Aws::APIGateway::Client.new(region: region)
 
 begin
   api_keys_with_plans = []
