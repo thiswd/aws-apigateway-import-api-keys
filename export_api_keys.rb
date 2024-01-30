@@ -25,10 +25,10 @@ begin
       begin
         usage_plans = apigateway.get_usage_plans(key_id: key.id).items
         api_keys_with_plans << {
-          id: key.id,
           name: key.name,
           value: key.value,
-          usage_plan_ids: usage_plans.map(&:id)
+          description: key.description,
+          usage_plan_names: usage_plans.map(&:name)
         }
         retrieved_count += 1
       rescue Aws::APIGateway::Errors::ServiceError => e
