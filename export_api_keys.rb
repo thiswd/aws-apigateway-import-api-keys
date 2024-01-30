@@ -9,8 +9,18 @@ end
 region = ARGV[0]
 apigateway = Aws::APIGateway::Client.new(region: region)
 
-file = File.read("api_keys.json")
-api_keys = JSON.parse(file)
+begin
+  file = File.read("api_keys.json")
+  api_keys = JSON.parse(file)
+rescue Errno::ENOENT => e
+  puts "Error: File not found - #{e.message}"
+rescue Errno::EACCES => e
+  puts "Error: File not accessible - #{e.message}"
+rescue JSON::ParserError => e
+  puts "Error: File content is not valid JSON - #{e.message}"
+rescue StandardError => e
+  puts "An unexpected error occurred - #{e.message}"
+end
 
 unless api_keys.has_key?("items")
   puts "No API keys found in #{filename}"
