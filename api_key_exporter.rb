@@ -37,7 +37,7 @@ class ApiKeyExporter
         if e.message.include?("Rate exceeded")
           puts "Rate limit hit, retrying..."
           sleep 1
-          retr
+          retry
         else
           puts "Error retrieving usage plans for key #{key["name"]} (#{key["id"]}): #{e.message}"
           error_count += 1
