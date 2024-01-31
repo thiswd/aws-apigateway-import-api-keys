@@ -1,26 +1,43 @@
 require 'aws-sdk-apigateway'
 require 'json'
+require 'optparse'
 
-if ARGV.length != 1
-  puts "Usage: ruby export_keys.rb <AWS_REGION>"
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: ruby export_api_keys.rb --region REGION --file FILE"
+
+  opts.on("--region REGION", "AWS Region") do |region|
+    options[:region] = region
+  end
+
+  opts.on("--file FILE", "Path to the api_keys.json file") do |file|
+    options[:file] = file
+  end
+end.parse!
+
+if !options[:region] || !options[:file]
+  puts "Both --region and --file arguments are required"
   exit
 end
 
-region = ARGV[0]
-apigateway = Aws::APIGateway::Client.new(region: region)
-input_file = "api_keys.json"
+apigateway = Aws::APIGateway::Client.new(region: options[:region])
+input_file = options[:file]
 
 begin
   file = File.read(input_file)
   api_keys = JSON.parse(file)
 rescue Errno::ENOENT => e
   puts "Error: File not found - #{e.message}"
+  exit
 rescue Errno::EACCES => e
   puts "Error: File not accessible - #{e.message}"
+  exit
 rescue JSON::ParserError => e
   puts "Error: File content is not valid JSON - #{e.message}"
+  exit
 rescue StandardError => e
   puts "An unexpected error occurred - #{e.message}"
+  exit
 end
 
 unless api_keys.has_key?("items")
