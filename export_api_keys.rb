@@ -68,17 +68,24 @@ begin
         usage_plan_names: usage_plans.map(&:name)
       }
       api_keys_count += 1
+      sleep 0.1
     rescue Aws::APIGateway::Errors::ServiceError => e
-      puts "Error retrieving usage plans for key #{key["name"]} (#{key["id"]}): #{e.message}"
-      error_count += 1
+      if e.message.include?("Rate exceeded")
+        puts "Rate limit hit, retrying..."
+        sleep 1
+        retr
+      else
+        puts "Error retrieving usage plans for key #{key["name"]} (#{key["id"]}): #{e.message}"
+        error_count += 1
+      end
     end
   end
 
   File.write(filename, api_keys_with_plans.to_json)
   puts "Exported API keys with associated usage plans to #{filename}"
-  puts "Total API Keys: #{api_keys_count}"
+  puts "Total API Keys imported: #{api_keys_count}"
   puts "Total API Keys without usage plans: #{api_keys_without_plan_count}"
-  puts "Total Errors: #{error_count}"
+  puts "Total errors: #{error_count}"
 
   begin
     puts "Deleting #{input_file}..."
