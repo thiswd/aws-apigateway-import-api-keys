@@ -1,102 +1,40 @@
-require 'aws-sdk-apigateway'
-require 'json'
 require 'optparse'
+require_relative 'api_key_exporter'
 
-options = {}
-OptionParser.new do |opts|
-  opts.banner = "Usage: ruby export_api_keys.rb --region REGION --file FILE"
-
-  opts.on("--region REGION", "AWS Region") do |region|
-    options[:region] = region
+class ExportApiKeys
+  def self.run
+    options = parse_arguments
+    importer = ApiKeyExporter.new(options[:region], options[:file])
+    importer.export_api_keys
+    importer.delete_input_file
   end
 
-  opts.on("--file FILE", "Path to the api_keys.json file") do |file|
-    options[:file] = file
+  def self.parse_arguments
+    options = {}
+    OptionParser.new do |opts|
+      opts.banner = "Usage: ruby import_usage_plans.rb --region REGION --file FILE"
+
+      opts.on("--region REGION", "AWS Region") { |region| options[:region] = region }
+      opts.on("--file FILE", "Path to the usage_plans.json file") { |file| options[:file] = file }
+    end.parse!
+
+    validate_arguments(options)
+    options
   end
-end.parse!
 
-if !options[:region] || !options[:file]
-  puts "Both --region and --file arguments are required"
-  exit
-end
+  private
 
-apigateway = Aws::APIGateway::Client.new(region: options[:region])
-input_file = options[:file]
+  def self.validate_arguments(options)
+    missing_args = []
+    missing_args << '--region' unless options[:region]
+    missing_args << '--file' unless options[:file]
 
-begin
-  file = File.read(input_file)
-  api_keys = JSON.parse(file)
-rescue Errno::ENOENT => e
-  puts "Error: File not found - #{e.message}"
-  exit
-rescue Errno::EACCES => e
-  puts "Error: File not accessible - #{e.message}"
-  exit
-rescue JSON::ParserError => e
-  puts "Error: File content is not valid JSON - #{e.message}"
-  exit
-rescue StandardError => e
-  puts "An unexpected error occurred - #{e.message}"
-  exit
-end
-
-unless api_keys.has_key?("items")
-  puts "No API keys found in #{filename}"
-  exit
-end
-
-begin
-  api_keys_with_plans = []
-  api_keys_count = 0
-  api_keys_without_plan_count = 0
-  error_count = 0
-  filename = "api_keys_with_plans.json"
-
-  api_keys["items"].each do |key|
-    begin
-      usage_plans = apigateway.get_usage_plans(key_id: key["id"]).items
-
-      if usage_plans.empty?
-        puts "Key #{key["name"]} (#{key["id"]}) has no usage plans"
-        api_keys_without_plan_count += 1
-      end
-
-      api_keys_with_plans << {
-        name: key["name"],
-        value: key["value"],
-        description: key["description"],
-        usage_plan_names: usage_plans.map(&:name)
-      }
-      api_keys_count += 1
-      sleep 0.1
-    rescue Aws::APIGateway::Errors::ServiceError => e
-      if e.message.include?("Rate exceeded")
-        puts "Rate limit hit, retrying..."
-        sleep 1
-        retr
-      else
-        puts "Error retrieving usage plans for key #{key["name"]} (#{key["id"]}): #{e.message}"
-        error_count += 1
-      end
+    if missing_args.any?
+      puts "Missing arguments: #{missing_args.join(', ')}"
+      puts "Usage: ruby import_usage_plans.rb --region REGION --file FILE"
+      exit
     end
   end
-
-  File.write(filename, api_keys_with_plans.to_json)
-  puts "Exported API keys with associated usage plans to #{filename}"
-  puts "Total API Keys imported: #{api_keys_count}"
-  puts "Total API Keys without usage plans: #{api_keys_without_plan_count}"
-  puts "Total errors: #{error_count}"
-
-  begin
-    puts "Deleting #{input_file}..."
-    File.delete(input_file)
-    puts "#{input_file} has been successfully deleted."
-  rescue Errno::ENOENT
-    puts "Error: The file #{input_file} does not exist."
-  rescue StandardError => e
-    puts "An error occurred while deleting the file #{input_file}: #{e.message}"
-  end
-
-rescue StandardError => e
-  puts "An error occurred: #{e.message}"
 end
+
+ExportApiKeys.run
