@@ -12,7 +12,7 @@ class ExportApiKeys
   def self.parse_arguments
     options = {}
     OptionParser.new do |opts|
-      opts.banner = "Usage: ruby import_usage_plans.rb --region REGION --file FILE"
+      opts.banner = "Usage: ruby export_api_keys.rb --region REGION --file FILE"
 
       opts.on("--region REGION", "AWS Region") { |region| options[:region] = region }
       opts.on("--file FILE", "Path to the usage_plans.json file") { |file| options[:file] = file }
@@ -31,7 +31,7 @@ class ExportApiKeys
 
     if missing_args.any?
       puts "Missing arguments: #{missing_args.join(', ')}"
-      puts "Usage: ruby import_usage_plans.rb --region REGION --file FILE"
+      puts "Usage: ruby export_api_keys.rb --region REGION --file FILE"
       exit
     end
   end

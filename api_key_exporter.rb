@@ -9,7 +9,7 @@ class ApiKeyExporter
   end
 
   def export_api_keys
-    api_keys = read_usage_plans
+    api_keys = read_api_keys
     api_keys_with_plans = []
     api_keys_count = 0
     api_keys_without_plan_count = 0
@@ -66,7 +66,7 @@ class ApiKeyExporter
 
   private
 
-  def read_usage_plans
+  def read_api_keys
     begin
       file = File.read(file_path)
       api_keys = JSON.parse(file)
