@@ -10,6 +10,8 @@ class ExportApiKeys
     importer.execute
   end
 
+  private
+
   def self.parse_arguments
     options = {}
     OptionParser.new do |opts|
@@ -23,8 +25,6 @@ class ExportApiKeys
     validate_arguments(options)
     options
   end
-
-  private
 
   def self.validate_arguments(options)
     missing_args = []
