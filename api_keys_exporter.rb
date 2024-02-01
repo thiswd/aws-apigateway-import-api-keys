@@ -2,7 +2,8 @@ require 'aws-sdk-apigateway'
 require 'json'
 
 class ApiKeysExporter
-  WAIT_TIME_DEFAULT = 1
+  OUTPUT_FILENAME = "api_keys.json".freeze
+  WAIT_TIME_DEFAULT = 1.freeze
 
   def initialize(region, wait_time)
     @apigateway = Aws::APIGateway::Client.new(region:)
@@ -14,13 +15,12 @@ class ApiKeysExporter
   end
 
   def execute
-    output_filename = "api_keys.json"
-    export_api_keys(output_filename)
-    print_results(output_filename)
+    export_api_keys
+    print_results
   end
 
   private
-  def export_api_keys(filename)
+  def export_api_keys
     token = nil
     per_page = 500
 
@@ -39,7 +39,7 @@ class ApiKeysExporter
       puts "An error occurred: #{e.message}"
     end
 
-    save_to_file(filename)
+    save_to_file
   end
 
   def add_usage_plans(api_keys)
@@ -47,7 +47,7 @@ class ApiKeysExporter
       begin
         usage_plans = @apigateway.get_usage_plans(key_id: key["id"]).items
 
-        print_api_without_plan(key) if usage_plans.empty?
+        print_key_without_plan(key) if usage_plans.empty?
 
         @api_keys_with_plans << {
           name: key["name"],
@@ -71,17 +71,17 @@ class ApiKeysExporter
     end
   end
 
-  def print_api_without_plan(key)
+  def print_key_without_plan(key)
     puts "Key #{key["name"]} (#{key["id"]}) has no usage plans"
     @api_keys_without_plan_count += 1
   end
 
-  def save_to_file(filename)
-    File.write(filename, @api_keys_with_plans.to_json)
+  def save_to_file
+    File.write(OUTPUT_FILENAME, @api_keys_with_plans.to_json)
   end
 
-  def print_results(filename)
-    puts "Exported API keys with associated usage plans to #{filename}"
+  def print_results
+    puts "Exported API keys with associated usage plans to #{OUTPUT_FILENAME}"
     puts "Total API keys imported: #{@api_keys_count}"
     puts "Total API keys without usage plans: #{@api_keys_without_plan_count}"
     puts "Total errors: #{@error_count}"
