@@ -1,7 +1,7 @@
 require 'aws-sdk-apigateway'
 require 'json'
 
-class ApiKeyExporter
+class ApiKeysExporter
   WAIT_TIME_DEFAULT = 1
 
   def initialize(region, wait_time)

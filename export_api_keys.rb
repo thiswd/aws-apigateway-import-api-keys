@@ -1,12 +1,12 @@
 require 'optparse'
-require_relative 'api_key_exporter'
+require_relative 'api_keys_exporter'
 
 class ExportApiKeys
   USAGE_INSTRUCTION = "Usage: ruby export_api_keys.rb --region REGION --wait-time WAIT_TIME".freeze
 
   def self.run
     options = parse_arguments
-    importer = ApiKeyExporter.new(options[:region], options[:wait_time])
+    importer = ApiKeysExporter.new(options[:region], options[:wait_time])
     importer.execute
   end
 
