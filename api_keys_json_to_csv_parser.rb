@@ -50,7 +50,10 @@ class ApiKeysJsonToCsvParser
       csv << ["Name", "Key", "Description", "Enabled", "UsageplanIds"]
       api_keys.each do |key|
         usage_plan_ids = key["usage_plan_names"].map { |name| @usage_plan_ids.fetch(name, "") }.join(",")
-        csv << [key["name"], key["value"], key["description"], key["enabled"] ? 'TRUE' : 'FALSE', usage_plan_ids]
+        source = "Imported key"
+        description = key["description"] ? [key["description"], source].join(". ") : source
+        enabled = key["enabled"] ? "TRUE" : "FALSE"
+        csv << [key["name"], key["value"], description, enabled, usage_plan_ids]
       end
     end
   rescue Errno::EACCES => e
