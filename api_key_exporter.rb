@@ -2,8 +2,11 @@ require 'aws-sdk-apigateway'
 require 'json'
 
 class ApiKeyExporter
-  def initialize(region)
+  WAIT_TIME_DEFAULT = 1
+
+  def initialize(region, wait_time)
     @apigateway = Aws::APIGateway::Client.new(region:)
+    @wait_time = wait_time || WAIT_TIME_DEFAULT
     @api_keys_with_plans = []
     @api_keys_count = 0
     @api_keys_without_plan_count = 0
@@ -57,7 +60,7 @@ class ApiKeyExporter
       rescue Aws::APIGateway::Errors::ServiceError => e
         if e.message.include?("Rate exceeded")
           puts "Rate limit hit, retrying..."
-          sleep 1
+          sleep @wait_time
           retry
         else
           puts "Error retrieving usage plans for key #{key["name"]} (#{key["id"]}): #{e.message}"
