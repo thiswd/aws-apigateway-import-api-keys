@@ -1,6 +1,6 @@
 # API Keys Management Tools
 
-This collection of Ruby scripts provides a comprehensive solution for exporting API keys from AWS API Gateway, converting them to a CSV format, and preparing them for re-importation using AWS CLI.
+This collection of Ruby scripts provides a comprehensive solution for exporting API keys from AWS API Gateway, converting them to a CSV format, and preparing them for re-importation using AWS CLI. Ideal for simplifying API key migrations and backups with advanced features like error handling and usage plan ID mapping.
 
 ## Tools Included
 
