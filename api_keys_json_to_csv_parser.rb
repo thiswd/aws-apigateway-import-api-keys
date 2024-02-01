@@ -16,6 +16,7 @@ class ApiKeysJsonToCsvParser
     api_keys = read_json_file
     write_csv_file(api_keys)
     print_results
+    delete_input_file
   rescue Aws::Errors::ServiceError => e
     puts "AWS Service Error occurred: #{e.message}"
   rescue IOError => e
@@ -66,5 +67,17 @@ class ApiKeysJsonToCsvParser
 
   def print_results
     puts "Parsed API keys to #{OUTPUT_FILENAME}"
+  end
+
+  def delete_input_file
+    begin
+      puts "Deleting #{@json_file}..."
+      File.delete(@json_file)
+      puts "#{@json_file} has been successfully deleted."
+    rescue Errno::ENOENT
+      puts "Error: The file #{@json_file} does not exist."
+    rescue StandardError => e
+      puts "An error occurred while deleting the file #{@json_file}: #{e.message}"
+    end
   end
 end
