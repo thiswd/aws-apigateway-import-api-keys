@@ -53,6 +53,7 @@ class ApiKeyExporter
           name: key["name"],
           value: key["value"],
           description: key["description"],
+          enabled: key["enabled"],
           usage_plan_names: usage_plans.map(&:name)
         }
         @api_keys_count += 1
