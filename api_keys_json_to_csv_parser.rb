@@ -15,6 +15,7 @@ class ApiKeysJsonToCsvParser
     load_usage_plan_ids
     api_keys = read_json_file
     write_csv_file(api_keys)
+    print_results
   rescue Aws::Errors::ServiceError => e
     puts "AWS Service Error occurred: #{e.message}"
   rescue IOError => e
@@ -58,5 +59,9 @@ class ApiKeysJsonToCsvParser
   rescue StandardError => e
     puts "Failed to write CSV file: #{e.message}"
     exit
+  end
+
+  def print_results
+    puts "Parsed API keys to #{OUTPUT_FILENAME}"
   end
 end
