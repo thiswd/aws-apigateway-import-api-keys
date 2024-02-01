@@ -1,5 +1,5 @@
 require 'optparse'
-require_relative 'api_keys_exporter'
+require_relative 'lib/api_keys_exporter'
 
 class ExportApiKeys
   USAGE_INSTRUCTION = "Usage: ruby export_api_keys.rb --region REGION --wait-time WAIT_TIME".freeze

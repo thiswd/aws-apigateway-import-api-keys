@@ -1,5 +1,5 @@
 require 'optparse'
-require_relative 'api_keys_json_to_csv_parser'
+require_relative 'lib/api_keys_json_to_csv_parser'
 
 class ConvertApiKeysToCsv
   USAGE_INSTRUCTION = "Usage: ruby convert_api_keys_to_csv.rb --region REGION --file FILE".freeze
