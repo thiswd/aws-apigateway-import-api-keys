@@ -22,11 +22,13 @@ gem install aws-sdk-apigateway
 Navigate to the directory containing `export_api_keys.rb` and execute the script with the options:
 
 ```bash
-ruby export_api_keys.rb --region <YourAWSRegion> --wait-time <WaitTimeInSeconds>
+ruby export_api_keys.rb --region <YourAWSRegion> --wait-time <WaitTimeInSeconds> --profile <YourProfileName>
 ```
 - **--region**: Specifies the AWS region from which to export API keys.
 
 - **--wait-time**: (optional) Defines how long the script should wait (in seconds) if it hits the rate limit.
+
+- **--profile**: (optional) The AWS CLI profile to use. Defaults to the AWS CLI's default profile if not specified.
 
 ### Convert API Keys to CSV
 
