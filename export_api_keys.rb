@@ -6,7 +6,7 @@ class ExportApiKeys
 
   def self.run
     options = parse_arguments
-    importer = ApiKeysExporter.new(options[:region], options[:wait_time])
+    importer = ApiKeysExporter.new(options[:region], options[:wait_time], options[:profile])
     importer.execute
   end
 
@@ -20,6 +20,7 @@ class ExportApiKeys
       opts.on("--wait-time WAIT_TIME", Integer, "Wait time in seconds for rate limit handling") do |wt|
         options[:wait_time] = wt
       end
+      opts.on("--profile PROFILE", "AWS Profile") { |profile| options[:profile] = profile }
     end.parse!
 
     validate_arguments(options)
@@ -29,6 +30,7 @@ class ExportApiKeys
   def self.validate_arguments(options)
     missing_args = []
     missing_args << '--region' unless options[:region]
+    missing_args << '--profile' unless options[:profile]
 
     if missing_args.any?
       puts "Missing arguments: #{missing_args.join(', ')}"

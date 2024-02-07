@@ -5,8 +5,9 @@ class ApiKeysExporter
   OUTPUT_FILENAME = "api_keys.json".freeze
   WAIT_TIME_DEFAULT = 1.freeze
 
-  def initialize(region, wait_time)
-    @apigateway = Aws::APIGateway::Client.new(region:)
+  def initialize(region, wait_time, profile_name = 'default')
+    credentials = Aws::SharedCredentials.new(profile_name: profile_name).credentials
+    @apigateway = Aws::APIGateway::Client.new(region: region, credentials: credentials)
     @wait_time = wait_time || WAIT_TIME_DEFAULT
     @api_keys_with_plans = []
     @api_keys_count = 0
