@@ -30,7 +30,6 @@ class ExportApiKeys
   def self.validate_arguments(options)
     missing_args = []
     missing_args << '--region' unless options[:region]
-    missing_args << '--profile' unless options[:profile]
 
     if missing_args.any?
       puts "Missing arguments: #{missing_args.join(', ')}"
