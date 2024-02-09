@@ -2,7 +2,7 @@ require 'optparse'
 require_relative 'lib/api_keys_exporter'
 
 class ExportApiKeys
-  USAGE_INSTRUCTION = "Usage: ruby export_api_keys.rb --region REGION --wait-time WAIT_TIME".freeze
+  USAGE_INSTRUCTION = "Usage: ruby export_api_keys.rb --region REGION --wait-time WAIT_TIME --profile PROFILE".freeze
 
   def self.run
     options = parse_arguments
