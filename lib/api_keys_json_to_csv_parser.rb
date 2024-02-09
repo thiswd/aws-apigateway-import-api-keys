@@ -4,6 +4,7 @@ require 'aws-sdk-apigateway'
 
 class ApiKeysJsonToCsvParser
   OUTPUT_FILENAME = "api_keys.csv".freeze
+  CSV_HEADERS = ["Name", "Key", "Description", "Enabled", "UsageplanIds"].freeze
 
   def initialize(region, json_file)
     @apigateway = Aws::APIGateway::Client.new(region: region)
@@ -47,8 +48,11 @@ class ApiKeysJsonToCsvParser
   end
 
   def write_csv_file(api_keys)
-    CSV.open(OUTPUT_FILENAME, "wb") do |csv|
-      csv << ["Name", "Key", "Description", "Enabled", "UsageplanIds"]
+    File.open(OUTPUT_FILENAME, "w:UTF-8") do |file|
+      file.write("\uFEFF")
+    end
+
+    CSV.open(OUTPUT_FILENAME, "a", write_headers: true, headers: CSV_HEADERS) do |csv|
       api_keys.each do |key|
         usage_plan_ids = key["usage_plan_names"].map { |name| @usage_plan_ids.fetch(name, "") }.join(",")
         source = "Imported key"
