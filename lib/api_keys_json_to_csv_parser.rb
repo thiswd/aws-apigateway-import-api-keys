@@ -48,11 +48,7 @@ class ApiKeysJsonToCsvParser
   end
 
   def write_csv_file(api_keys)
-    File.open(OUTPUT_FILENAME, "w:UTF-8") do |file|
-      file.write("\uFEFF")
-    end
-
-    CSV.open(OUTPUT_FILENAME, "a", write_headers: true, headers: CSV_HEADERS) do |csv|
+    CSV.open(OUTPUT_FILENAME, "wb", write_headers: true, headers: CSV_HEADERS) do |csv|
       api_keys.each do |key|
         usage_plan_ids = key["usage_plan_names"].map { |name| @usage_plan_ids.fetch(name, "") }.join(",")
         source = "Imported key"
