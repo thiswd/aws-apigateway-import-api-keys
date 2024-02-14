@@ -39,7 +39,8 @@ class ApiKeysJsonToCsvParser
   end
 
   def load_usage_plan_ids
-    @apigateway.get_usage_plans.items.each do |plan|
+    limit = 100
+    @apigateway.get_usage_plans(limit:).items.each do |plan|
       @usage_plan_ids[plan.name] = plan.id
     end
   rescue Aws::Errors::ServiceError => e
