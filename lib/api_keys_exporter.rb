@@ -21,6 +21,7 @@ class ApiKeysExporter
   end
 
   private
+
   def export_api_keys
     token = nil
     per_page = 500
